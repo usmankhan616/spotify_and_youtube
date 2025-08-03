@@ -1,0 +1,10 @@
+# Virtual Environment
+.venv/
+__pycache__/
+
+# Secret API Keys
+.env
+client_secret.json
+
+# Cache files
+.cache
