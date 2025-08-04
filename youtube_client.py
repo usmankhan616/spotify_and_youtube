@@ -1,6 +1,7 @@
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
 import googleapiclient.errors
+import time
 
 SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 
@@ -15,12 +16,12 @@ def get_authenticated_service():
         api_service_name, api_version, credentials=credentials)
     return youtube
 
-def create_playlist(youtube, title, description):
+def create_playlist(youtube, title, description, privacy_status):
     request = youtube.playlists().insert(
         part="snippet,status",
         body={
             "snippet": { "title": title, "description": description, "defaultLanguage": "en" },
-            "status": { "privacyStatus": "private" }
+            "status": { "privacyStatus": privacy_status }
         }
     )
     response = request.execute()
@@ -51,3 +52,4 @@ def add_songs_to_playlist(youtube, playlist_id, song_list):
             }
         )
         add_request.execute()
+        time.sleep(1)

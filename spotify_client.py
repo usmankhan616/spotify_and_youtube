@@ -1,5 +1,6 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.exceptions import SpotifyException
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,7 +21,18 @@ def get_playlist_songs(playlist_url):
                 song_name = item['track']['name']
                 artist_name = item['track']['artists'][0]['name']
                 song_list.append({'song': song_name, 'artist': artist_name})
-        return song_list
+        # On success, return the list and no error message
+        return song_list, None
+    
+    except SpotifyException as e:
+        # Check for specific error codes
+        if e.http_status == 429 or e.http_status >= 500:
+            error_message = "Spotify is currently busy. Please try again in 15-30 minutes."
+            return None, error_message
+        else:
+            # Handle other potential Spotify API errors
+            return None, f"A Spotify API error occurred: {e.msg}"
+            
     except Exception as e:
-        print(f"An error occurred during Spotify fetch: {e}")
-        return None
+        # Handle other general errors (e.g., network issues)
+        return None, f"An unexpected error occurred: {str(e)}"
