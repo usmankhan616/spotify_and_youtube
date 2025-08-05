@@ -1,15 +1,31 @@
 import os
+import json # <-- Add this new import
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from spotify_client import get_playlist_songs
-from youtube_client import get_authenticated_service, create_playlist, add_songs_to_playlist
+from youtube_client import create_playlist, add_songs_to_playlist
 from database import create_user, find_user_by_email, save_playlist, get_user_playlists
 from werkzeug.security import check_password_hash
 from google.oauth2.credentials import Credentials
 import googleapiclient.discovery
-import google_auth_oauthlib.flow # <-- THIS LINE WAS MISSING
+import google_auth_oauthlib.flow
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+
+# --- YouTube OAuth Configuration ---
+SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
+API_SERVICE_NAME = "youtube"
+API_VERSION = "v3"
+# We no longer need the CLIENT_SECRETS_FILE variable
+
+# Load client secrets from environment variable
+try:
+    CLIENT_SECRETS_STR = os.getenv('CLIENT_SECRET_JSON')
+    CLIENT_SECRETS_DICT = json.loads(CLIENT_SECRETS_STR)
+except (TypeError, json.JSONDecodeError):
+    CLIENT_SECRETS_DICT = None
+    print("ERROR: CLIENT_SECRET_JSON environment variable is not set or is invalid.")
+
 
 @app.route('/')
 def home():
@@ -63,13 +79,8 @@ def dashboard():
 def profile():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    
-    user_details = {
-        'username': session['username'],
-        'email': session['email']
-    }
+    user_details = {'username': session['username'], 'email': session['email']}
     user_playlists = get_user_playlists(session['user_id'])
-    
     return render_template('profile.html', user=user_details, playlists=user_playlists)
 
 @app.route('/convert', methods=['POST'])
@@ -83,16 +94,12 @@ def convert():
         return redirect(url_for('authorize'))
     return redirect(url_for('create_youtube_playlist'))
 
-# --- YouTube OAuth Routes ---
-CLIENT_SECRETS_FILE = "client_secret.json"
-SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
-API_SERVICE_NAME = "youtube"
-API_VERSION = "v3"
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
-
 @app.route('/authorize')
 def authorize():
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES)
+    if not CLIENT_SECRETS_DICT:
+        return "Server configuration error: YouTube client secrets are not set.", 500
+    # Use from_client_config instead of from_client_secrets_file
+    flow = google_auth_oauthlib.flow.Flow.from_client_config(CLIENT_SECRETS_DICT, scopes=SCOPES)
     flow.redirect_uri = url_for('oauth2callback', _external=True)
     authorization_url, state = flow.authorization_url(access_type='offline', include_granted_scopes='true')
     session['state'] = state
@@ -101,9 +108,10 @@ def authorize():
 @app.route('/oauth2callback')
 def oauth2callback():
     state = session.get('state')
-    if not state:
+    if not state or not CLIENT_SECRETS_DICT:
         return redirect(url_for('login'))
-    flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES, state=state)
+    # Use from_client_config instead of from_client_secrets_file
+    flow = google_auth_oauthlib.flow.Flow.from_client_config(CLIENT_SECRETS_DICT, scopes=SCOPES, state=state)
     flow.redirect_uri = url_for('oauth2callback', _external=True)
     authorization_response = request.url
     flow.fetch_token(authorization_response=authorization_response)
