@@ -1,5 +1,5 @@
 import os
-import json # <-- Add this new import
+import json
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from spotify_client import get_playlist_songs
 from youtube_client import create_playlist, add_songs_to_playlist
@@ -16,7 +16,6 @@ app.secret_key = os.urandom(24)
 SCOPES = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 API_SERVICE_NAME = "youtube"
 API_VERSION = "v3"
-# We no longer need the CLIENT_SECRETS_FILE variable
 
 # Load client secrets from environment variable
 try:
@@ -149,5 +148,6 @@ def create_youtube_playlist():
     except Exception as e:
         return render_template('dashboard.html', username=session.get('username'), error=str(e))
 
-if __name__ == '__main__':
+# This is needed for Vercel to find the app
+if __name__ == "__main__":
     app.run(debug=True)
