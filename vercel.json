@@ -4,8 +4,8 @@
     {
       "src": "app.py",
       "use": "@vercel/python",
-      "config": {
-        "installCommand": "pip install -r requirements.txt"
+      "config": { 
+        "pip": "pip install -r requirements.txt"
       }
     }
   ],
