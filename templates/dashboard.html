@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Playlist Sync</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Header Styling */
+        .header {
+            background-color: #191919;
+            padding: 20px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #282828;
+        }
+        .header .logo {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .header .logo span {
+            color: #1DB954; /* Spotify Green */
+        }
+        .header .user-info a {
+            color: #b3b3b3;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 500;
+        }
+        .header .user-info a:hover {
+            color: #ffffff;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+        }
+        .converter-wrapper {
+            background: rgba(40, 40, 40, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 600px;
+        }
+        .converter-wrapper h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b3b3b3;
+            font-size: 14px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #282828;
+            border: 1px solid #404040;
+            border-radius: 5px;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #1DB954;
+        }
+        button {
+            background-color: #1DB954;
+            color: #ffffff;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #1ed760;
+        }
+
+        /* Result/Error message styling */
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .result h2 { margin-bottom: 10px; }
+        .result a { color: #1DB954; font-weight: bold; }
+        .success { background-color: #2e7d32; }
+        .error { background-color: #c62828; }
+
+        /* Footer Styling */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #191919;
+            color: #b3b3b3;
+            font-size: 14px;
+            border-top: 1px solid #282828;
+        }
+        .footer a {
+            color: #1DB954;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="logo">Playlist<span>Sync</span></div>
+        <div class="user-info">
+            <span>Welcome, {{ username }}!</span>
+            <a href="/profile">My Profile</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="converter-wrapper">
+            <h1>Convert Your Playlist</h1>
+            <form action="/convert" method="post">
+                <label for="spotify_url">Spotify Playlist URL:</label>
+                <input type="url" id="spotify_url" name="spotify_url" placeholder="Paste your Spotify playlist link here" required>
+
+                <label for="playlist_title">New YouTube Playlist Title:</label>
+                <input type="text" id="playlist_title" name="playlist_title" placeholder="Enter a name for your new playlist" required>
+                
+                <label for="privacy">Playlist Privacy:</label>
+                <select name="privacy" id="privacy">
+                    <option value="public">Public</option>
+                    <option value="private">Private</option>
+                </select>
+                
+                <button type="submit">PROCEED</button>
+            </form>
+
+            {% if result_url %}
+                <div class="result success">
+                    <h2>Success!</h2>
+                    <p>Your new playlist is here: <a href="{{ result_url }}" target="_blank" rel="noopener noreferrer">Click to View</a></p>
+                </div>
+            {% endif %}
+            {% if error %}
+                <div class="result error">
+                    <h2>An Error Occurred</h2>
+                    <p>{{ error }}</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 PlaylistSync. Created by {{ username }}.</p>
+    </footer>
+
+</body>
+</html>

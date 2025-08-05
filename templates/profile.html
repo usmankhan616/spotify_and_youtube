@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile | Playlist Sync</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; background-color: #121212; color: #ffffff; display: flex; flex-direction: column; min-height: 100vh; }
+        .header { background-color: #191919; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #282828; }
+        .header .logo { font-size: 24px; font-weight: 600; }
+        .header .logo span { color: #1DB954; }
+        .header .user-info a { color: #b3b3b3; text-decoration: none; margin-left: 20px; font-weight: 500; }
+        .header .user-info a:hover { color: #ffffff; }
+        .main-content { flex: 1; padding: 50px; max-width: 900px; margin: auto; width: 100%; }
+        .profile-box, .playlist-box { background: rgba(40, 40, 40, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 15px; margin-bottom: 30px; }
+        h1, h2 { font-weight: 600; color: #1DB954; margin-bottom: 20px; }
+        .profile-details p { font-size: 18px; margin-bottom: 10px; color: #b3b3b3; }
+        .profile-details span { color: #ffffff; font-weight: 500; }
+        .playlist-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #282828; }
+        .playlist-item:last-child { border-bottom: none; }
+        .playlist-info a { color: #ffffff; text-decoration: none; font-size: 18px; font-weight: 500; }
+        .playlist-info a:hover { text-decoration: underline; }
+        .privacy-badge { padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
+        .public { background-color: #2e7d32; color: #ffffff; }
+        .private { background-color: #c62828; color: #ffffff; }
+        .footer { text-align: center; padding: 20px; background-color: #191919; color: #b3b3b3; font-size: 14px; border-top: 1px solid #282828; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Playlist<span>Sync</span></div>
+        <div class="user-info">
+            <a href="/dashboard">Dashboard</a>
+            <span>{{ user.username }}</span>
+            <a href="/logout">Logout</a>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="profile-box">
+            <h1>My Profile</h1>
+            <div class="profile-details">
+                <p>Username: <span>{{ user.username }}</span></p>
+                <p>Email: <span>{{ user.email }}</span></p>
+            </div>
+        </div>
+
+        <div class="playlist-box">
+            <h2>Created Playlists</h2>
+            {% if playlists %}
+                {% for playlist in playlists %}
+                    <div class="playlist-item">
+                        <div class="playlist-info">
+                            <a href="{{ playlist.youtube_url }}" target="_blank" rel="noopener noreferrer">{{ playlist.playlist_title }}</a>
+                        </div>
+                        <span class="privacy-badge {{ playlist.privacy_status }}">{{ playlist.privacy_status }}</span>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>You haven't created any playlists yet.</p>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 PlaylistSync.</p>
+    </footer>
+</body>
+</html>

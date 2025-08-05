@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Playlist Sync</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Montserrat', sans-serif; overflow: hidden; }
+        .split-screen { display: flex; height: 100vh; }
+        .left-panel, .right-panel { width: 50%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .left-panel { background-color: #121212; flex-direction: column; }
+        .form-wrapper { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 15px; backdrop-filter: blur(5px); box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); }
+        .form-container { width: 380px; color: #ffffff; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { font-size: 32px; font-weight: 700; margin-bottom: 5px; }
+        .header p { color: #b3b3b3; }
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group .input-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #b3b3b3; }
+        .input-group .toggle-password { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: #b3b3b3; cursor: pointer; }
+        input { width: 100%; padding: 15px 50px; background-color: #282828; border: 1px solid #404040; border-radius: 5px; color: #ffffff; font-family: 'Montserrat', sans-serif; font-size: 14px; }
+        input[type="password"] { font-size: 24px; /* Makes password dots larger */ }
+        input:focus { outline: none; border-color: #1DB954; }
+        button { width: 100%; padding: 15px; background-color: #1DB954; color: #ffffff; border: none; border-radius: 50px; cursor: pointer; font-size: 16px; font-weight: 700; letter-spacing: 1px; transition: background-color 0.3s; }
+        button:hover { background-color: #1ed760; }
+        .sub-text { text-align: center; margin-top: 20px; font-size: 14px; color: #b3b3b3; }
+        .sub-text a { color: #1DB954; text-decoration: none; font-weight: 600; }
+        .flash-message { padding: 15px; margin-bottom: 20px; border-radius: 5px; text-align: center; font-size: 14px; }
+        .success { background-color: #2e7d32; color: #ffffff; }
+        .error { background-color: #c62828; color: #ffffff; }
+        .right-panel { background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=2070&auto=format&fit=crop'); background-size: cover; background-position: center; padding: 50px; }
+        .quote-container { text-align: center; color: #ffffff; }
+        .quote-container h2 { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 700; font-style: italic; line-height: 1.4; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+    <div class="split-screen">
+        <div class="left-panel">
+            <div class="form-wrapper">
+                <div class="form-container">
+                    <div class="header">
+                        <h1>Welcome Back</h1>
+                        <p>Login to sync your playlists.</p>
+                    </div>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="flash-message {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
+
+                    <form action="/login" method="post">
+                        <div class="input-group">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" name="email" placeholder="Email" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" name="password" placeholder="Password" required id="login-password">
+                            <i class="fas fa-eye toggle-password" data-target="login-password"></i>
+                        </div>
+                        <button type="submit">LOGIN</button>
+                    </form>
+                    <p class="sub-text">New here? <a href="/register">Create an account</a></p>
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="quote-container">
+                <h2>"Where words fail, music speaks."</h2>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.toggle-password').forEach(item => {
+            item.addEventListener('click', event => {
+                const targetId = event.currentTarget.getAttribute('data-target');
+                const passwordInput = document.getElementById(targetId);
+                const icon = event.currentTarget;
+
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

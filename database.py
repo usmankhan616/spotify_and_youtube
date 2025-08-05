@@ -2,6 +2,7 @@ import os
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from bson.objectid import ObjectId
 
 # --- Database Connection ---
 MONGO_URI = os.getenv('MONGO_URI')
@@ -23,12 +24,18 @@ def find_user_by_email(email):
     return users_collection.find_one({'email': email})
 
 # --- Playlist Functions ---
-def save_playlist(user_id, spotify_url, youtube_url, playlist_title):
+def save_playlist(user_id, spotify_url, youtube_url, playlist_title, privacy_status):
     playlists_collection = db.get_collection('playlists')
     return playlists_collection.insert_one({
-        'user_id': user_id,
+        'user_id': ObjectId(user_id),
         'spotify_url': spotify_url,
         'youtube_url': youtube_url,
         'playlist_title': playlist_title,
+        'privacy_status': privacy_status, # <-- New field to store privacy
         'created_at': datetime.utcnow()
     })
+
+def get_user_playlists(user_id):
+    playlists_collection = db.get_collection('playlists')
+    # Find all playlists matching the user's ID and sort by newest first
+    return playlists_collection.find({'user_id': ObjectId(user_id)}).sort('created_at', -1)
